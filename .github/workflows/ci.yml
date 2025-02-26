@@ -22,8 +22,6 @@ jobs:
         run: |
           npm install newman
           npm install newman-allure-reporter
-          wget -qO- https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.16.1/allure-commandline-2.16.1.tgz | tar xvz -C /tmp
-          export PATH=$PATH:/tmp/allure-2.16.1/bin
 
       - name: Run Postman Collection with Allure Reporter
         run: newman run Petstore.postman_collection.json -r allure,cli --reporter-allure-export ./allure-results
