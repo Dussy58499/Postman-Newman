@@ -14,8 +14,13 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install Dependencies
+        run: npm i
+
       - name: Install Newman
-        run: npm install -g newman
+        run: npm install newman
 
       - name: Run Postman Collection
         run: newman run Petstore.postman_collection.json
+
+
