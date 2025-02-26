@@ -16,12 +16,16 @@ jobs:
           node-version: 18
 
       - name: Install Dependencies
-        run: npm i
+        run: npm install
 
       - name: Install Newman and Allure Reporter
         run: |
           npm install newman
           npm install newman-reporter-allure
+
+      - name: Install Allure Commandline
+        run: |
+          sudo apt-get install -y allure
 
       - name: Run Postman Collection
         run: |
