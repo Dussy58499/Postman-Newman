@@ -1,4 +1,4 @@
-name: Run Newman Tests with Allure Report
+name: Run Newman Tests
 
 on: [push, pull_request]
 
@@ -18,26 +18,26 @@ jobs:
       - name: Install Dependencies
         run: npm i
 
-      - name: Install Newman and Allure Reporter
-        run: |
-          npm install newman
-          npm install newman-allure-reporter
+      - name: Install Newman
+        run: npm install newman
 
-      - name: Run Postman Collection with Allure Reporter
-        run: newman run Petstore.postman_collection.json -r allure,cli --reporter-allure-export ./allure-results
-        continue-on-error: true  # Continue even if the test fails
+      - name: Run Postman Collection
+        run: newman run Petstore.postman_collection.json -r html,cli --reporter-html-export newman-report.html
+        continue-on-error: true  # This ensures that the job continues even if this step fails
 
-      - name: Generate Allure Report
-        run: |
-          allure generate ./allure-results --clean -o ./allure-report
-          allure open ./allure-report
-        continue-on-error: true  # Continue even if the report generation fails
+      - name: Setup GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.TOKEN }}
+          branch: report
+          folder: .
+        continue-on-error: true  # This ensures that the job continues even if this step fails
 
-      - name: Commit and push allure report
+      - name: Commit and push report
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add ./allure-report
-          git commit -m "Add Allure test report"
+          git add newman-report.html
+          git commit -m "Add Newman test report"
           git push origin report
-        continue-on-error: true  # Continue even if the commit fails
+        continue-on-error: true  # This ensures that the job continues even if this step fails
