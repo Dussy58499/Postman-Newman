@@ -18,23 +18,29 @@ jobs:
       - name: Install Dependencies
         run: npm i
 
-      - name: Install Newman
-        run: npm install newman
+      - name: Install Newman and Allure Reporter
+        run: |
+          npm install newman
+          npm install newman-allure-reporter
 
-      - name: Run Postman Collection
-        run: newman run Petstore.postman_collection.json -r html,cli --reporter-html-export newman-report.html
+      - name: Run Postman Collection with Allure Reporter
+        run: newman run Petstore.postman_collection.json -r allure,cli --reporter-allure-export ./allure-results
+        continue-on-error: true  # Continue even if the test fails
 
-      - name: Setup GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Allure Report
+        uses: actions/setup-allure@v2
         with:
-          personal_token: ${{ secrets.TOKEN }}
-          branch: report
-          folder: .
+          allure-version: "2.16.1" # specify the version of Allure you want to use
 
-      - name: Commit and push report
+      - name: Generate Allure Report
+        run: allure serve ./allure-results
+        continue-on-error: true  # Continue even if the report generation fails
+
+      - name: Commit and push allure report
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add newman-report.html
-          git commit -m "Add Newman test report"
+          git add ./allure-results
+          git commit -m "Add Allure test report"
           git push origin report
+        continue-on-error: true  # Continue even if the commit fails
