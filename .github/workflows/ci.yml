@@ -1,4 +1,4 @@
-name: Run Newman Tests
+name: Run Newman Tests with Allure Report
 
 on: [push, pull_request]
 
@@ -22,25 +22,24 @@ jobs:
         run: |
           npm install newman
           npm install newman-allure-reporter
+          wget -qO- https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.16.1/allure-commandline-2.16.1.tgz | tar xvz -C /tmp
+          export PATH=$PATH:/tmp/allure-2.16.1/bin
 
       - name: Run Postman Collection with Allure Reporter
         run: newman run Petstore.postman_collection.json -r allure,cli --reporter-allure-export ./allure-results
         continue-on-error: true  # Continue even if the test fails
 
-      - name: Setup Allure Report
-        uses: actions/setup-allure@v2
-        with:
-          allure-version: "2.16.1" # specify the version of Allure you want to use
-
       - name: Generate Allure Report
-        run: allure serve ./allure-results
+        run: |
+          allure generate ./allure-results --clean -o ./allure-report
+          allure open ./allure-report
         continue-on-error: true  # Continue even if the report generation fails
 
       - name: Commit and push allure report
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add ./allure-results
+          git add ./allure-report
           git commit -m "Add Allure test report"
           git push origin report
         continue-on-error: true  # Continue even if the commit fails
