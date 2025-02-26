@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "newman": "^6.2.1"
+    "allure-commandline": "^2.32.2"
+  },
+  "devDependencies": {
+    "newman": "^6.2.1",
+    "newman-reporter-allure": "^3.2.0"
   }
 }

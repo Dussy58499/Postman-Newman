@@ -5,6 +5,7 @@ on: [push, pull_request]
 jobs:
   newman-tests:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -17,10 +18,26 @@ jobs:
       - name: Install Dependencies
         run: npm i
 
-      - name: Install Newman
-        run: npm install newman
+      - name: Install Newman and Allure Reporter
+        run: |
+          npm install newman
+          npm install newman-reporter-allure
 
       - name: Run Postman Collection
-        run: newman run Petstore.postman_collection.json
+        run: |
+          newman run Petstore.postman_collection.json --reporters cli,allure
 
-
+      - name: Generate Allure Report
+        run: |
+          allure generate allure-results --clean -o allure-report
+          
+      - name: Push Allure Report to `report` branch
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout -b report
+          rm -rf *
+          cp -r allure-report/* .
+          git add .
+          git commit -m "Update Allure report"
+          git push --force --set-upstream origin report
